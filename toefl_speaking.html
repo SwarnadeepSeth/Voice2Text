@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="voice_style.css" />
+    <title>Speech to Text</title>
+  </head>
+  <body>
+    <div class="container">
+      <p style="text-align: center; font-size: 30px;" class="heading">Speak Confidently</p>
+      <p style="text-align: center;">(Available In Chrome Only)</p>
+
+      <div class="line"></div>
+      <button class="btn record">
+        <div class="icon">
+          <ion-icon name="mic-outline"></ion-icon>
+          <img src="bars.svg" alt="" />
+        </div>
+        <p>Start Listening</p>
+      </button>
+
+      <p style="text-align:center;" class="heading">Result :</p>
+
+      <div class="container">
+        <div class="words">
+          <p style="font-size: 18px;
+          padding: 20px;
+          display: block;
+          height: 250px;
+          border-style: solid;
+          border-width: 2px;
+          width: 93%;
+          max-height: 100%;
+          overflow-y: auto;"; id="p"></p>
+        </div>
+      </div>
+
+        <div class="buttons">
+        <button class="btn clear">
+            <ion-icon name="trash-outline"></ion-icon>
+            <p>Clear</p>
+        </button>
+        <button class="btn download">
+            <ion-icon name="cloud-download-outline"></ion-icon>
+            <p>Download</p>
+        </button>
+        </div>
+
+    </div>
+
+    <script>
+      var speech = true;
+      window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      recognition.interimResults = true;
+      recognition.continuous = true;
+
+      const words = document.querySelector('.words');
+      const p = document.getElementById('p');
+      words.appendChild(p);
+
+      recognition.addEventListener('result', e => {
+        const transcript = Array.from(e.results)
+          .map(result => result[0])
+          .map(result => result.transcript)
+          .join('');
+        p.innerHTML = transcript;
+        console.log(transcript);
+      });
+      
+      recognition.addEventListener('end', () => {
+        document.querySelector('.record p').textContent = 'Start Listening';
+        document.querySelector('.record .icon img').classList.remove('animate');
+      });
+
+      document.querySelector('.record').addEventListener('click', () => {
+        if (speech) {
+          recognition.start();
+          speech = false;
+          document.querySelector('.record p').textContent = 'Stop Listening';
+          document.querySelector('.record .icon img').classList.add('animate');
+        } else {
+          recognition.stop();
+          speech = true;
+          document.querySelector('.record p').textContent = 'Start Listening';
+          document.querySelector('.record .icon img').classList.remove('animate');
+        }
+      });
+
+      document.querySelector('.clear').addEventListener('click', () => {
+            p.innerHTML = '';
+      });
+
+      document.querySelector('.download').addEventListener('click', () => {
+        const text = p.innerText;
+        const filename = 'transcript.txt';
+        const element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('download', filename);
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+      });
+
+    </script>
+
+    <!-- IONICONS -->
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"
+    ></script>
+  </body>
+</html>
